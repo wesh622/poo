@@ -1,0 +1,111 @@
+classDiagram
+direction RL
+
+class Attributable {
+  <<interface>>
+  +String getAuthor()
+}
+
+class Timestampable {
+  <<interface>>
+  +long getTimestamp()
+}
+
+class Keywordable {
+  <<interface>>
+  +List<String> getKeywords()
+  +void addKeyword(String keyword)
+  +void removeKeyword(String keyword)
+  +int keywordsCount()
+}
+
+class DiaryService {
+  <<interface>>
+  +String getTitle()
+  +void post(Attributable entry)
+  +List<Attributable> getEntries()
+  +int getEntriesCount()
+  +int getKeywordableEntriesCount()
+  +List<Attributable> findEntriesByAuthor(String author)
+  +Timestampable getLatestEntry()
+  +List<Keywordable> findEntriesByKeywords(String[] keywords)
+  +List<Article> findEntriesByContent(String[] str)
+  +List<AbstractEntry> findEntriesByKeywordsOrContent(String[] keywords)
+}
+
+class AbstractEntry {
+  <<abstract>>
+  #String author
+  #long publicationDate
+  +AbstractEntry(long publicationDate, String author)
+  +String getAuthor()
+  +long getTimestamp()
+}
+
+class AbstractMedia {
+  <<abstract>>
+  #List<String> keywordsList
+  +AbstractMedia(long publicationDate, String author)
+  +void addKeyword(String tag)
+  +void removeKeyword(String tag)
+  +int keywordsCount()
+  +List<String> getKeywords()
+}
+
+class Article {
+  -String content
+  +Article(long publicationDate, String author, String content)
+  +String getContent()
+}
+
+class Photo {
+  -String url
+  -String caption
+  +Photo(long publicationDate, String author, String url, String caption)
+  +String getURL()
+  +String getCaption()
+}
+
+class Video {
+  -String url
+  -String title
+  -int length
+  +Video(long publicationDate, String author, String url, String title, int length)
+  +String getURL()
+  +String getTitle()
+  +int getLength()
+}
+
+class DiaryServiceImpl {
+  -String title
+  -List<Attributable> entries
+  +DiaryServiceImpl(String title)
+  +String getTitle()
+  +void post(Attributable entry)
+  +List<Attributable> getEntries()
+  +int getEntriesCount()
+  +int getKeywordableEntriesCount()
+  +List<Attributable> findEntriesByAuthor(String author)
+  +Timestampable getLatestEntry()
+  +List<Keywordable> findEntriesByKeywords(String[] keywords)
+  +List<Article> findEntriesByContent(String[] str)
+  +List<AbstractEntry> findEntriesByKeywordsOrContent(String[] keywords)
+}
+
+
+AbstractEntry ..|> Attributable
+AbstractEntry ..|> Timestampable
+AbstractMedia --|> AbstractEntry
+AbstractMedia ..|> Keywordable
+Article --|> AbstractEntry
+Photo --|> AbstractMedia
+Video --|> AbstractMedia
+DiaryServiceImpl ..|> DiaryService
+
+DiaryServiceImpl "1" o-- "0..*" Attributable : entries
+DiaryService ..> Attributable
+DiaryService ..> Keywordable
+DiaryService ..> Timestampable
+DiaryService ..> Article
+DiaryService ..> AbstractEntry
+
