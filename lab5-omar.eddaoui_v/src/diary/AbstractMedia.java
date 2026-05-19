@@ -12,7 +12,7 @@ public abstract class AbstractMedia extends AbstractEntry implements Keywordable
     }
 
     public void addKeyword(String keyword){
-        if(!this.liste.contains(keyword)){
+        if(keyword != null && !this.liste.contains(keyword)){
             this.liste.add(keyword);
         }
     }
