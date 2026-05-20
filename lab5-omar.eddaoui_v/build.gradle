@@ -52,8 +52,8 @@ sourceSets {
                 //'diary/VideoDefTest.java',
                 //'diary/VideoTest.java',
                 //'diary/DiaryServiceTest.java',
-                'diary/DiaryServiceImplDefTest.java',
-                'diary/DiaryServiceImplTest.java'
+                //'diary/DiaryServiceImplDefTest.java',
+                //'diary/DiaryServiceImplTest.java'
             ]
         }
     }

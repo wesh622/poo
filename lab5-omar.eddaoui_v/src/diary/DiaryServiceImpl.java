@@ -1,14 +1,15 @@
 package diary;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DiaryServiceImpl implements DiaryService{
     String title;
-    List<Attributable> content;
+    ArrayList<Attributable> content;
 
     public DiaryServiceImpl(String title){
         this.title = title;
-        this.content = new List<Attributable>();
+        this.content = new ArrayList<Attributable>();
     }
 
     public String getTitle(){
@@ -17,14 +18,14 @@ public class DiaryServiceImpl implements DiaryService{
 
     public void post(Attributable entry){
         if(this.content == null){
-            this.content = new List<Attributable>();
+            this.content = new ArrayList<Attributable>();
         }
         this.content.add(entry);
     }
 
     public List<Attributable> getEntries(){
         if(this.content == null){
-            this.content = new List<Attributable>();
+            this.content = new ArrayList<Attributable>();
         }
         return this.content;
     }
@@ -46,8 +47,8 @@ public class DiaryServiceImpl implements DiaryService{
             int total = 0;
             int n = this.getEntriesCount();
             for(int i=0;i<n;i++){
-                if(this.content.get(i).keywordsCount()){
-                    total += total;
+                if(this.content.get(i) instanceof Keywordable){
+                    total ++;
                 }
             }
             return total;
@@ -55,7 +56,7 @@ public class DiaryServiceImpl implements DiaryService{
     }
 
     public List<Attributable> findEntriesByAuthor(String author){
-        List<Attributable> a = new List<Attributable>();
+        ArrayList<Attributable> a = new ArrayList<Attributable>();
         if(this.content == null){
             return a;
         }
@@ -76,31 +77,38 @@ public class DiaryServiceImpl implements DiaryService{
             long t = 0;
             Timestampable l = null;
             for(Attributable elt : this.content){
-                if(elt.getTimestamp() >= t){
-                    t = elt.getTimestamp();
-                    l = elt;
+                if(elt instanceof Timestampable){
+                   if(((Timestampable) elt).getTimestamp() >= t){
+                        t = ((Timestampable) elt).getTimestamp();
+                        l = (Timestampable) elt;
+                    } 
                 }
+                
             }
             return l;
         }
     }
 
     public List<Keywordable> findEntriesByKeywords(String[] keywords){
-        List<Keywordable> a = new List<Keywordable>();
+        ArrayList<Keywordable> a = new ArrayList<Keywordable>();
         if(this.content == null || this.content.size() == 0){
             return a;
         }
         else{
             for(Attributable elt : this.content){
-                boolean b = true;
-                for(String s : keywords){
-                    if(!elt.liste.contains(s)){
-                        b = false;
+                if(elt instanceof Keywordable){
+                    Keywordable k = (Keywordable) elt;
+                    boolean b = true;
+                    for(String s : keywords){
+                        if(!k.getKeywords().contains(s)){
+                            b = false;
+                        }
+                    }
+                    if(b){
+                        a.add(k);
                     }
                 }
-                if(b){
-                    a.add(elt);
-                }
+                
             }
             return a;
         }
@@ -108,34 +116,42 @@ public class DiaryServiceImpl implements DiaryService{
     }
     //au moins un des mot dans le contenu
     public List<Article> findEntriesByContent(String[] str){
-        List<Article> a = new List<Article>();
-        if(this.content == null || this.content.size() == 0){
-            return a;
-        }
-        else{
+        ArrayList<Article> a = new ArrayList<Article>();
+
             for(Attributable elt : this.content){
-                boolean b = false;
-                for(String s : keywords){
-                    if(elt.getContent.equals(s)){
-                        b = true;
+                if(elt instanceof Article){
+                    boolean b = true;
+                    Article temp = (Article) elt;
+                    for(String s : str){
+                        if(!temp.getContent().contains(s)){
+                            b = false;
+                        }
+                    }
+                    if(b){
+                        a.add(temp);
                     }
                 }
-                if(b){
-                    a.add(elt);
-                }
+                
+                
             }
             return a;
-        }
+
     }
 
     public List<AbstractEntry> findEntriesByKeywordsOrContent(String[] keywords){
-        List<Article> c = findEntriesByContent(keywords);
-        List<Keywordable> k = findEntriesByKeywords(keywords);
+        ArrayList<Article> c = (ArrayList<Article>) findEntriesByContent(keywords);
+        ArrayList<Keywordable> k = (ArrayList<Keywordable>) findEntriesByKeywords(keywords);
+        ArrayList<AbstractEntry> tab = new ArrayList<AbstractEntry>();
+        for(Article elt :c ){
+            AbstractEntry r = (AbstractEntry) elt;
+            tab.add(r);
+        }
         for(Keywordable elt : k ){
-            if(!c.contains(elt)){
-                c.add(elt);
+            AbstractEntry r = (AbstractEntry) elt;
+            if(!tab.contains(r)){
+                tab.add(r);
             }
         }
-        return c;
+        return tab;
     }
 }

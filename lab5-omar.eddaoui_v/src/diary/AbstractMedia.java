@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractMedia extends AbstractEntry implements Keywordable{
-    private ArrayList<String> liste;
+    ArrayList<String> liste;
 
     public AbstractMedia(long date,String author){
         super(date, author);
