@@ -1,0 +1,10 @@
+{
+  "positions": {
+    "EXENS.PA": {"name": "Exosens",      "qty": 2, "buy": 61.20},
+    "GTT.PA":   {"name": "GTT",           "qty": 2, "buy": 203.20},
+    "IDL.PA":   {"name": "ID Logistics",  "qty": 1, "buy": 362.50},
+    "MEDCL.PA": {"name": "MedinCell",     "qty": 4, "buy": 28.06}
+  },
+  "cash": 114.0,
+  "transactions": []
+}
