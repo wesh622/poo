@@ -21,7 +21,7 @@ TELEGRAM_CHAT_ID = os.environ['TELEGRAM_CHAT_ID']
 PARIS = ZoneInfo('Europe/Paris')
 
 PORTFOLIO = {
-    'EXENS.PA': {'name': 'Exosens',      'qty': 26, 'buy': 1.20},
+    'EXENS.PA': {'name': 'Exosens',      'qty': 2,  'buy': 61.20},
     'GTT.PA':   {'name': 'GTT',           'qty': 2,  'buy': 203.20},
     'IDL.PA':   {'name': 'ID Logistics',  'qty': 1,  'buy': 362.50},
     'MEDCL.PA': {'name': 'MedinCell',     'qty': 4,  'buy': 28.06},
@@ -51,10 +51,12 @@ def send_telegram(text: str) -> None:
     try:
         r = requests.post(
             url,
-            json={'chat_id': TELEGRAM_CHAT_ID, 'text': text, 'parse_mode': 'HTML'},
+            json={'chat_id': TELEGRAM_CHAT_ID, 'text': text},
             timeout=10,
         )
-        r.raise_for_status()
+        if not r.ok:
+            logger.error('Telegram error %s: %s', r.status_code, r.text)
+            return
         logger.info('Telegram message sent (%d chars)', len(text))
     except Exception as e:
         logger.error('Telegram send failed: %s', e)
@@ -126,7 +128,7 @@ def get_price(ticker: str) -> float | None:
 
 def build_report(label: str) -> str:
     now = datetime.now(PARIS)
-    lines = [f'<b>{label}</b>\n📅 {now.strftime("%d/%m/%Y %H:%M")} (Paris)\n']
+    lines = [f'{label}', f'📅 {now.strftime("%d/%m/%Y %H:%M")} (Paris)', '']
     total_inv = total_val = 0.0
 
     for ticker, pos in PORTFOLIO.items():
@@ -140,24 +142,24 @@ def build_report(label: str) -> str:
             s = '+' if pnl >= 0 else ''
             total_val += val
             lines.append(
-                f'<b>{pos["name"]}</b> ({ticker})\n'
-                f'  {pos["qty"]} × {price:.2f}€ = {val:.2f}€  '
+                f'{pos["name"]} ({ticker})\n'
+                f'  {pos["qty"]} x {price:.2f}€ = {val:.2f}€  '
                 f'({s}{pnl:.2f}€ / {s}{pct:.1f}%)'
             )
         else:
             total_val += inv
-            lines.append(f'<b>{pos["name"]}</b> ({ticker})\n  ⚠️ Prix indisponible')
+            lines.append(f'{pos["name"]} ({ticker})\n  ⚠️ Prix indisponible')
 
     pnl_t = total_val - total_inv
     pct_t = pnl_t / total_inv * 100 if total_inv else 0
     s = '+' if pnl_t >= 0 else ''
     cash = 114.0
     lines.append(
-        f'\n<b>━━━━━━━━━━━━━━━━</b>\n'
+        f'\n━━━━━━━━━━━━━━━━\n'
         f'Investi : {total_inv:.2f}€\n'
         f'Valeur  : {total_val:.2f}€\n'
         f'P&L     : {s}{pnl_t:.2f}€ ({s}{pct_t:.1f}%)\n'
-        f'Espèces : ~{cash:.0f}€\n'
+        f'Especes : ~{cash:.0f}€\n'
         f'Total   : ~{total_val + cash:.0f}€'
     )
     return '\n'.join(lines)
@@ -174,9 +176,9 @@ def check_alerts() -> None:
             if abs(chg) >= 5:
                 s = '+' if chg >= 0 else ''
                 send_telegram(
-                    f'⚠️ <b>ALERTE {pos["name"]}</b> ({ticker})\n'
+                    f'⚠️ ALERTE {pos["name"]} ({ticker})\n'
                     f'Variation : {s}{chg:.1f}%\n'
-                    f'Prix actuel : {price:.2f}€  |  Précédent : {prev:.2f}€'
+                    f'Prix actuel : {price:.2f}€  |  Precedent : {prev:.2f}€'
                 )
                 logger.info('Alert sent for %s: %+.1f%%', ticker, chg)
         _prev_prices[ticker] = price
@@ -203,14 +205,14 @@ def run_scheduled() -> None:
 if __name__ == '__main__':
     logger.info('Bot portefeuille started')
     send_telegram(
-        '🤖 <b>Bot Portefeuille Omar démarré</b>\n\n'
+        '🤖 Bot Portefeuille Omar demarre\n\n'
         '📊 Rapports automatiques :\n'
-        '  ☀️ 09h00 — ouverture\n'
-        '  🕛 12h30 — mi-journée\n'
-        '  🌙 17h35 — clôture\n'
-        '  📅 Lundi–vendredi uniquement\n\n'
-        '⚠️ Alerte si variation ≥ ±5% (vérif. toutes les 15 min)\n\n'
-        '📌 En attente d\'achat : EXAIL.PA (~400€)'
+        '  ☀️ 09h00 ouverture\n'
+        '  🕛 12h30 mi-journee\n'
+        '  🌙 17h35 cloture\n'
+        '  Lundi-vendredi uniquement\n\n'
+        '⚠️ Alerte si variation +-5% (toutes les 15 min)\n\n'
+        '📌 En attente achat : EXAIL.PA (~400€)'
     )
 
     # Seed initial prices for alert tracking
