@@ -167,6 +167,12 @@ def _parse_price(text: str):
     except ValueError:
         return None
 
+def _price_plausible(price: float, ref: float) -> bool:
+    """Return False if price is implausibly far from the reference buy price."""
+    if ref <= 0:
+        return True
+    return (ref * 0.02) <= price <= (ref * 50)
+
 def get_price_boursorama(ticker: str):
     code = BOURSORAMA_CODES.get(ticker)
     if not code:
@@ -203,15 +209,20 @@ def get_price_yfinance(ticker: str):
         logger.warning('yfinance %s: %s', ticker, e)
     return None
 
-def get_price(ticker: str):
+def get_price(ticker: str, buy_price: float = 0.0):
     p = get_price_boursorama(ticker)
     if p:
-        logger.info('%s -> %.3f EUR (Boursorama)', ticker, p)
-        return p
+        if _price_plausible(p, buy_price):
+            logger.info('%s -> %.3f EUR (Boursorama)', ticker, p)
+            return p
+        logger.warning('%s: Boursorama %.2f hors plage (ref %.2f), bascule yfinance', ticker, p, buy_price)
     p = get_price_yfinance(ticker)
     if p:
-        logger.info('%s -> %.3f EUR (yfinance)', ticker, p)
-        return p
+        if _price_plausible(p, buy_price):
+            logger.info('%s -> %.3f EUR (yfinance)', ticker, p)
+            return p
+        logger.warning('%s: yfinance %.2f hors plage (ref %.2f), indispo', ticker, p, buy_price)
+        return None
     logger.error('%s: unavailable', ticker)
     return None
 
@@ -228,7 +239,7 @@ def build_report(label: str) -> str:
     md_lines = [f'**{label}** — {now.strftime("%Y-%m-%d %H:%M")}', '']
 
     for ticker, pos in positions.items():
-        price = get_price(ticker)
+        price = get_price(ticker, pos['buy'])
         inv = pos['qty'] * pos['buy']
         total_inv += inv
         if price:
@@ -272,7 +283,7 @@ def check_alerts():
     with _portfolio_lock:
         positions = dict(_portfolio['positions'])
     for ticker, pos in positions.items():
-        price = get_price(ticker)
+        price = get_price(ticker, pos['buy'])
         if not price:
             continue
         prev = _prev_prices.get(ticker)
