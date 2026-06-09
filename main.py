@@ -27,12 +27,13 @@ PARIS = ZoneInfo('Europe/Paris')
 
 DEFAULT_PORTFOLIO = {
     'positions': {
-        'EXENS.PA': {'name': 'Exosens',      'qty': 2, 'buy': 61.20},
-        'GTT.PA':   {'name': 'GTT',           'qty': 2, 'buy': 203.20},
-        'IDL.PA':   {'name': 'ID Logistics',  'qty': 1, 'buy': 362.50},
-        'MEDCL.PA': {'name': 'MedinCell',     'qty': 4, 'buy': 28.06},
+        'EXENS.PA': {'name': 'Exosens',            'qty': 2, 'buy': 61.20},
+        'GTT.PA':   {'name': 'GTT',                'qty': 2, 'buy': 203.20},
+        'IDL.PA':   {'name': 'ID Logistics',       'qty': 1, 'buy': 362.50},
+        'MEDCL.PA': {'name': 'MedinCell',          'qty': 8, 'buy': 28.01},
+        'EXAIL.PA': {'name': 'Exail Technologies', 'qty': 2, 'buy': 74.77},
     },
-    'cash': 114.0,
+    'cash': 1.37,
     'transactions': [],
 }
 
@@ -255,8 +256,8 @@ def build_report(label: str) -> str:
         f'Investi : {total_inv:.2f}€\n'
         f'Valeur  : {total_val:.2f}€\n'
         f'P&L     : {s}{pnl_t:.2f}€ ({s}{pct_t:.1f}%)\n'
-        f'Especes : ~{cash:.0f}€\n'
-        f'Total   : ~{total_val + cash:.0f}€'
+        f'Especes : ~{cash:.2f}€\n'
+        f'Total   : ~{total_val + cash:.2f}€'
     )
     md_lines += ['', f'**Total** : {total_val:.2f}€  P&L {s}{pnl_t:.2f}€ ({s}{pct_t:.1f}%)']
 
