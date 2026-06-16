@@ -38,3 +38,10 @@ Chaque ligne : date/heure (Paris) | identifiant Telegram | requete | statut | re
 /strategie ou /s
   Thèses et scores de chaque positio…"
 - 2026-06-16 13:50:49 | chat_id=6808484892 user=clyde (id 6808484892) | requete: "/promesses" | statut: autorise | reponse: "Aucune promesse suivie. Ajoute avec /annonce TICKER texte | YYYY-MM-DD"
+- 2026-06-16 13:51:10 | chat_id=6808484892 user=clyde (id 6808484892) | requete: "/p" | statut: autorise | reponse: "📊 Portefeuille (live)
+📅 16/06/2026 13:51 (Paris)
+
+Allianz SE (ALV.DE)
+  1 x 397.00€ = 397.00€  (+151.78€ / +61.9%)
+Amundi PEA Emergent (MSCI Emerging) (PAEEM.PA)
+  3 x 37.00€ = 111.00€  (+15.93€ / +16…"
