@@ -1,4 +1,5 @@
 import os
+import copy
 import time
 import json
 import base64
@@ -27,23 +28,16 @@ PARIS = ZoneInfo('Europe/Paris')
 
 DEFAULT_PORTFOLIO = {
     'positions': {
-        'ALV.DE':   {'name': 'Allianz SE',                          'qty': 1, 'buy': 245.22},
-        'PAEEM.PA': {'name': 'Amundi PEA Emergent (MSCI Emerging)',  'qty': 3, 'buy': 31.69},
-        'CS.PA':    {'name': 'AXA',                                  'qty': 2, 'buy': 27.72},
-        'EXA.PA':   {'name': 'Exail Technologies',                   'qty': 3, 'buy': 84.09,  'target': 110.0, 'stop': 58.0,  'alloc_target': 400},
-        'EXENS.PA': {'name': 'Exosens',                              'qty': 2, 'buy': 61.75,  'target': 95.0,  'stop': 48.0,  'alloc_target': 500},
-        'GTT.PA':   {'name': 'GTT',                                  'qty': 2, 'buy': 204.51, 'target': 240.0, 'stop': 170.0, 'alloc_target': 300},
-        'IDL.PA':   {'name': 'ID Logistics Group',                   'qty': 1, 'buy': 364.94, 'target': 460.0, 'stop': 290.0, 'alloc_target': 250},
-        'AI.PA':    {'name': "L'Air Liquide",                        'qty': 1, 'buy': 158.25},
-        'MC.PA':    {'name': 'LVMH',                                 'qty': 5, 'buy': 662.52},
-        'MEDCL.PA': {'name': 'MedinCell',                            'qty': 8, 'buy': 28.01,  'target': 45.0,  'stop': 20.0,  'alloc_target': 300},
-        'RUI.PA':   {'name': 'Rubis',                                'qty': 3, 'buy': 21.59},
-        'SAN.PA':   {'name': 'Sanofi',                               'qty': 2, 'buy': 86.99},
-        'SU.PA':    {'name': 'Schneider Electric',                   'qty': 1, 'buy': 234.52},
+        'EXENS.PA': {'name': 'Exosens',            'qty': 2,  'buy': 61.20,  'target': 95.0,  'stop': 48.0,  'alloc_target': 500},
+        'GTT.PA':   {'name': 'GTT',                'qty': 2,  'buy': 203.20, 'target': 240.0, 'stop': 170.0, 'alloc_target': 300},
+        'IDL.PA':   {'name': 'ID Logistics',       'qty': 1,  'buy': 362.50, 'target': 460.0, 'stop': 290.0, 'alloc_target': 250},
+        'MEDCL.PA': {'name': 'MedinCell',          'qty': 8,  'buy': 28.01,  'target': 45.0,  'stop': 20.0,  'alloc_target': 300},
+        'EXA.PA':   {'name': 'Exail Technologies', 'qty': 2,  'buy': 74.77,  'target': 110.0, 'stop': 58.0,  'alloc_target': 400},
     },
-    'cash': 384.69,
+    'cash': 1.37,
     'transactions': [],
     'promises': [],
+    'theses': {},  # rempli depuis DEFAULT_THESES au premier chargement
 }
 
 _portfolio: dict = {}
@@ -98,12 +92,14 @@ def load_portfolio():
         try:
             _portfolio = json.loads(content)
             _portfolio.setdefault('promises', [])
+            if not _portfolio.get('theses'):
+                _portfolio['theses'] = copy.deepcopy(DEFAULT_THESES)
             logger.info('Portfolio loaded from GitHub')
             return
         except Exception as e:
             logger.warning('portfolio.json parse error: %s', e)
-    import copy
     _portfolio = copy.deepcopy(DEFAULT_PORTFOLIO)
+    _portfolio['theses'] = copy.deepcopy(DEFAULT_THESES)
     logger.info('Using default portfolio')
 
 def save_portfolio():
@@ -194,12 +190,6 @@ BOURSORAMA_CODES = {
     'IDL.PA':   '1rPIDL',
     'MEDCL.PA': '1rPMEDCL',
     'EXA.PA':   '1rPEXA',
-    'AI.PA':    '1rPAI',
-    'CS.PA':    '1rPCS',
-    'MC.PA':    '1rPMC',
-    'RUI.PA':   '1rPRUI',
-    'SAN.PA':   '1rPSAN',
-    'SU.PA':    '1rPSU',
 }
 
 _HEADERS = {
@@ -296,11 +286,11 @@ def get_all_news_headlines(ticker: str, limit: int = 5):
     code = BOURSORAMA_CODES.get(ticker)
     if not code:
         return []
+    out = []
     try:
         r = requests.get(f'https://www.boursorama.com/cours/{code}/actualites/', headers=_HEADERS, timeout=10)
         r.raise_for_status()
         soup = BeautifulSoup(r.text, 'lxml')
-        out = []
         for sel in ['a.c-news-list__link', 'div.c-news-list__item a', 'article a', 'h3 a']:
             for tag in soup.select(sel):
                 text = tag.get_text(strip=True)
@@ -312,7 +302,7 @@ def get_all_news_headlines(ticker: str, limit: int = 5):
                 return out
     except Exception as e:
         logger.warning('News %s: %s', ticker, e)
-    return out if 'out' in dir() else []
+    return out
 
 # ── Report builder ─────────────────────────────────────────────────────────────────────────────────
 
@@ -365,8 +355,9 @@ def build_report(label: str) -> str:
 
 # ── Conseil / Strategie ────────────────────────────────────────────────────────────────────────────
 
-# Thèses et scores par ticker (mis à jour manuellement ou via revue hebdo)
-_THESES = {
+# Thèses et scores de depart par ticker (persistes ensuite dans portfolio.json
+# sous 'theses' et ajustes automatiquement selon les resultats reels)
+DEFAULT_THESES = {
     'EXENS.PA': {
         'score': 22, 'target': 95.0, 'stop': 48.0, 'alloc_target': 500,
         'resume': 'Défense/vision nocturne — commandes record, doublement capacité prod',
@@ -389,11 +380,11 @@ _THESES = {
     },
 }
 
-def _conseil_action(ticker: str, pos: dict, price: float | None) -> str:
-    thèse = _THESES.get(ticker, {})
+def _conseil_action(ticker: str, pos: dict, price: float | None, thèse: dict) -> str:
     target = thèse.get('target') or pos.get('target', 0)
     stop   = thèse.get('stop')   or pos.get('stop', 0)
     alloc_t = thèse.get('alloc_target') or pos.get('alloc_target', 0)
+    score  = thèse.get('score', 25)
 
     if not price:
         return '⚠️ Prix indisponible'
@@ -403,6 +394,9 @@ def _conseil_action(ticker: str, pos: dict, price: float | None) -> str:
     pnl_pct = (price - pos['buy']) / pos['buy'] * 100
     s = '+' if pnl_pct >= 0 else ''
 
+    # Score degrade par les resultats reels (promesses manquees, stops passes)
+    if score < 14:
+        return f'🔴 Score thèse critique ({score}/25) — sortie a envisager malgre le prix'
     # Stop déclenché
     if stop and price <= stop:
         return f'🔴 STOP atteint ({price:.2f}€ ≤ {stop:.2f}€) — envisager la vente'
@@ -410,15 +404,13 @@ def _conseil_action(ticker: str, pos: dict, price: float | None) -> str:
     if target and price >= target * 0.95:
         return f'🟡 Objectif quasi-atteint ({price:.2f}€ / cible {target:.2f}€) — sécuriser les gains'
     # Sous-pondéré et P&L positif ou légèrement négatif : renforcer
-    if alloc_t and inv < alloc_t * 0.85 and pnl_pct > -15:
+    if alloc_t and inv < alloc_t * 0.85 and pnl_pct > -15 and score >= 18:
         manque = alloc_t - inv
         return f'🟢 Renforcer (+{manque:.0f}€ restants pour atteindre cible {alloc_t}€)'
     # Sur-pondéré
     if alloc_t and inv > alloc_t * 1.2:
         return f'🔵 Tenir — surpondéré vs cible {alloc_t}€, ne pas renforcer'
-    if not thèse:
-        return f'⚪ Pas de thèse définie — Tenir — P&L {s}{pnl_pct:.1f}%'
-    return f'🔵 Tenir — P&L {s}{pnl_pct:.1f}%, dans les bornes'
+    return f'🔵 Tenir — P&L {s}{pnl_pct:.1f}%, score {score}/25, dans les bornes'
 
 def build_conseil() -> str:
     now = datetime.now(PARIS)
@@ -426,11 +418,12 @@ def build_conseil() -> str:
     with _portfolio_lock:
         positions = dict(_portfolio['positions'])
         cash = _portfolio.get('cash', 0.0)
+        theses = dict(_portfolio.get('theses', {}))
 
     total_inv = 0.0
     for ticker, pos in positions.items():
         price = get_price(ticker, pos['buy'])
-        conseil = _conseil_action(ticker, pos, price)
+        conseil = _conseil_action(ticker, pos, price, theses.get(ticker, {}))
         prix_str = f'{price:.2f}€' if price else 'N/A'
         pru = pos['buy']
         lines.append(f'{pos["name"]} ({ticker}) — {prix_str} (PRU {pru:.2f}€)')
@@ -440,10 +433,11 @@ def build_conseil() -> str:
 
     reserve = cash
     prio = sorted(
-        [(t, _THESES[t]['alloc_target'] - pos['qty'] * pos['buy'])
-         for t, pos in positions.items() if t in _THESES and
-         _THESES[t]['alloc_target'] - pos['qty'] * pos['buy'] > 50],
-        key=lambda x: -_THESES.get(x[0], {}).get('score', 0)
+        [(t, theses[t]['alloc_target'] - pos['qty'] * pos['buy'])
+         for t, pos in positions.items() if t in theses and
+         theses[t]['alloc_target'] - pos['qty'] * pos['buy'] > 50 and
+         theses[t].get('score', 0) >= 18],
+        key=lambda x: -theses.get(x[0], {}).get('score', 0)
     )
     lines.append(f'💰 Cash disponible : {reserve:.2f}€')
     if prio and reserve > 50:
@@ -454,14 +448,26 @@ def build_conseil() -> str:
 def build_strategie_summary() -> str:
     lines = ['📊 Stratégie & Thèses', '']
     lines.append('Critères : sous-cotée · projets LT · track record · innovation · marché fort')
-    lines.append('Seuil achat : 18/25 · Seuil renforcement : 20/25\n')
-    for ticker, t in _THESES.items():
+    lines.append('Seuil achat : 18/25 · Seuil renforcement : 20/25 · Seuil sortie : <14/25\n')
+    with _portfolio_lock:
+        theses = dict(_portfolio.get('theses', {}))
+    for ticker, t in theses.items():
         lines.append(f'{ticker}  score {t["score"]}/25')
         lines.append(f'  {t["resume"]}')
         lines.append(f'  Objectif {t["target"]}€ · Stop {t["stop"]}€ · Cible alloc {t["alloc_target"]}€')
         lines.append('')
-    lines.append('Autres positions (sans thèse formalisée) : ALV.DE, PAEEM.PA, CS.PA, AI.PA, MC.PA, RUI.PA, SAN.PA, SU.PA')
     return '\n'.join(lines)
+
+def adjust_thesis(ticker: str, delta: int, reason: str):
+    with _portfolio_lock:
+        theses = _portfolio.setdefault('theses', {})
+        if ticker not in theses:
+            return
+        old = theses[ticker]['score']
+        new = max(0, min(25, old + delta))
+        theses[ticker]['score'] = new
+    save_portfolio()
+    append_strategy(f'Score {ticker} ajusté {delta:+d} ({reason}) — {old}/25 → {new}/25')
 
 # ── Promesses (annonces des entreprises) ────────────────────────────────────────────
 
@@ -523,9 +529,11 @@ def cmd_maj_promesse(args):
             return 'Numero invalide'
         promises[idx]['status'] = statut
         p = promises[idx]
-    save_portfolio()
     append_strategy(f'Promesse {p["ticker"]} ("{p["text"]}") marquee **{statut}** (echeance {p["deadline"]})')
-    return f'✅ Promesse #{idx + 1} marquee "{statut}"'
+    delta = 1 if statut == 'tenu' else -2
+    reason = f'promesse {"tenue" if statut == "tenu" else "manquee"} : "{p["text"]}"'
+    adjust_thesis(p['ticker'], delta, reason)
+    return f'✅ Promesse #{idx + 1} marquee "{statut}" — score {p["ticker"]} ajuste {delta:+d}'
 
 # ── Daily journal ─────────────────────────────────────────────────────────────────────────────────
 
@@ -562,10 +570,7 @@ def run_daily_journal():
         else:
             mvt = f'{price:.2f}€ (premiere mesure du jour)'
         headlines = get_all_news_headlines(ticker, limit=3)
-        if headlines:
-            actu = '; '.join(headlines)
-        else:
-            actu = 'actualite non recuperee'
+        actu = '; '.join(headlines) if headlines else 'actualite non recuperee'
         lines.append(f'**{pos["name"]} ({ticker})** : {mvt}\n  Actualites recentes : {actu}')
         _daily_close[ticker] = price
 
@@ -596,10 +601,12 @@ def run_weekly_review():
 
     with _portfolio_lock:
         positions = dict(_portfolio['positions'])
+        theses = dict(_portfolio.get('theses', {}))
 
     lines = []
     total_inv = total_val = 0.0
     alerts = []
+    to_penalize = []
     for ticker, pos in positions.items():
         price = get_price(ticker, pos['buy'])
         inv = pos['qty'] * pos['buy']
@@ -610,14 +617,28 @@ def run_weekly_review():
             pnl_pct = (price - pos['buy']) / pos['buy'] * 100
             s = '+' if pnl_pct >= 0 else ''
             lines.append(f'- {pos["name"]} ({ticker}): {price:.2f}€  {s}{pnl_pct:.1f}%')
-            t = _THESES.get(ticker, {})
+            t = theses.get(ticker, {})
             if t.get('stop') and price <= t['stop']:
                 alerts.append(f'STOP {ticker} ({price:.2f}€ ≤ {t["stop"]:.2f}€)')
+                if not t.get('stop_flagged'):
+                    to_penalize.append(ticker)
             elif t.get('target') and price >= t['target'] * 0.95:
                 alerts.append(f'OBJECTIF proche {ticker} ({price:.2f}€ / {t["target"]:.2f}€)')
+                if t.get('stop_flagged'):
+                    with _portfolio_lock:
+                        _portfolio['theses'][ticker]['stop_flagged'] = False
+            else:
+                if t.get('stop_flagged'):
+                    with _portfolio_lock:
+                        _portfolio['theses'][ticker]['stop_flagged'] = False
         else:
             total_val += inv
             lines.append(f'- {pos["name"]} ({ticker}): indisponible')
+
+    for ticker in to_penalize:
+        with _portfolio_lock:
+            _portfolio['theses'][ticker]['stop_flagged'] = True
+        adjust_thesis(ticker, -3, 'stop atteint lors de la revue hebdo')
 
     pnl_t = total_val - total_inv
     s = '+' if pnl_t >= 0 else ''
@@ -681,7 +702,7 @@ HELP_TEXT = (
     '/promesses\n'
     '  Liste les promesses suivies et leur statut\n\n'
     '/maj_promesse N tenu|manque\n'
-    '  Valide si une promesse a ete tenue\n\n'
+    '  Valide si une promesse a ete tenue (ajuste le score de la these)\n\n'
     '/help\n'
     '  Affiche ce message'
 )
@@ -848,7 +869,7 @@ if __name__ == '__main__':
         '🤖 Bot Portefeuille Omar demarre\n\n'
         'Rapports : ☀️ 09h00 / 🕛 12h30 / 🌙 17h35 (lun-ven)\n'
         'Journal quotidien : 📓 17h40 (lun-ven)\n'
-        'Revue strategie : 📆 lundi 09h00\n'
+        'Revue strategie : 📆 lundi 09h00 (ajuste les scores selon les stops/promesses)\n'
         'Alerte si variation +-5%\n\n'
         'Tape /help pour les commandes'
     )

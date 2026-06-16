@@ -16,6 +16,20 @@
 
 ---
 
+## Apprentissage automatique des scores (v1.2 — juin 2026)
+
+Les scores ne sont plus fixes : ils sont stockés dans `portfolio.json` (clé `theses`) et ajustés automatiquement par le bot selon les résultats réels, pas seulement la conviction initiale :
+
+- **Promesse d'entreprise tenue** (`/maj_promesse N tenu`) → score **+1**
+- **Promesse d'entreprise manquée** (`/maj_promesse N manque`) → score **-2**
+- **Stop atteint lors de la revue hebdo** → score **-3** (une seule fois par franchissement, pas chaque semaine)
+
+Chaque ajustement est logué ici automatiquement (voir section "Revues hebdomadaires") avec la raison et le score avant/après. Si le score d'une position tombe sous 14/25, `/conseil` recommande la sortie même si le prix est encore correct — la thèse elle-même est jugée invalidée par les faits.
+
+Le **journal quotidien** (`data/journal.md`, 17h40 lun-ven) complète ce mécanisme en gardant une trace jour par jour des mouvements de prix et des actualités récentes de chaque position, pour comparer ce qui a été annoncé avec ce qui s'est réellement passé.
+
+---
+
 ## Positions actuelles
 
 ### EXENS.PA — Exosens (PEA)
@@ -69,9 +83,10 @@
 |------|---------|--------------|--------|
 | 2026-06-09 | v1 | Critères initiaux | Création portefeuille |
 | 2026-06-16 | v1.1 | Correction ticker EXAIL.PA → EXA.PA | EXAIL.PA n'existe pas, causait des prix faux/indisponibles |
+| 2026-06-16 | v1.2 | Journal quotidien + suivi promesses + scores dynamiques | Le bot doit s'entraîner sur les résultats réels (annonces vs réalisé) plutôt que garder des scores figés |
 
 ---
 
 ## Revues hebdomadaires
 
-<!-- Les revues automatiques du bot sont ajoutées ici chaque lundi -->
+<!-- Les revues automatiques du bot sont ajoutees ici chaque lundi -->
