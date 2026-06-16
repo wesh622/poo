@@ -5,7 +5,7 @@ import json
 import base64
 import logging
 import threading
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from zoneinfo import ZoneInfo
 
 import requests
@@ -28,13 +28,21 @@ PARIS = ZoneInfo('Europe/Paris')
 
 DEFAULT_PORTFOLIO = {
     'positions': {
-        'EXENS.PA': {'name': 'Exosens',            'qty': 2,  'buy': 61.20,  'target': 95.0,  'stop': 48.0,  'alloc_target': 500},
-        'GTT.PA':   {'name': 'GTT',                'qty': 2,  'buy': 203.20, 'target': 240.0, 'stop': 170.0, 'alloc_target': 300},
-        'IDL.PA':   {'name': 'ID Logistics',       'qty': 1,  'buy': 362.50, 'target': 460.0, 'stop': 290.0, 'alloc_target': 250},
-        'MEDCL.PA': {'name': 'MedinCell',          'qty': 8,  'buy': 28.01,  'target': 45.0,  'stop': 20.0,  'alloc_target': 300},
-        'EXA.PA':   {'name': 'Exail Technologies', 'qty': 2,  'buy': 74.77,  'target': 110.0, 'stop': 58.0,  'alloc_target': 400},
+        'ALV.DE':   {'name': 'Allianz SE',                         'qty': 1, 'buy': 245.22},
+        'PAEEM.PA': {'name': 'Amundi PEA Emergent (MSCI Emerging)', 'qty': 3, 'buy': 31.69},
+        'CS.PA':    {'name': 'AXA',                                'qty': 2, 'buy': 27.72},
+        'EXA.PA':   {'name': 'Exail Technologies',                 'qty': 3, 'buy': 84.09,  'target': 110.0, 'stop': 58.0,  'alloc_target': 400},
+        'EXENS.PA': {'name': 'Exosens',                            'qty': 2, 'buy': 61.75,  'target': 95.0,  'stop': 48.0,  'alloc_target': 500},
+        'GTT.PA':   {'name': 'GTT',                                'qty': 2, 'buy': 204.51, 'target': 240.0, 'stop': 170.0, 'alloc_target': 300},
+        'IDL.PA':   {'name': 'ID Logistics Group',                 'qty': 1, 'buy': 364.94, 'target': 460.0, 'stop': 290.0, 'alloc_target': 250},
+        'AI.PA':    {'name': "L'Air Liquide",                      'qty': 1, 'buy': 158.25},
+        'MC.PA':    {'name': 'LVMH',                               'qty': 5, 'buy': 662.52},
+        'MEDCL.PA': {'name': 'MedinCell',                          'qty': 8, 'buy': 28.01,  'target': 45.0,  'stop': 20.0,  'alloc_target': 300},
+        'RUI.PA':   {'name': 'Rubis',                              'qty': 3, 'buy': 21.59},
+        'SAN.PA':   {'name': 'Sanofi',                             'qty': 2, 'buy': 86.99},
+        'SU.PA':    {'name': 'Schneider Electric',                 'qty': 1, 'buy': 234.52},
     },
-    'cash': 1.37,
+    'cash': 384.69,
     'transactions': [],
     'promises': [],
     'theses': {},  # rempli depuis DEFAULT_THESES au premier chargement
@@ -270,6 +278,12 @@ BOURSORAMA_CODES = {
     'IDL.PA':   '1rPIDL',
     'MEDCL.PA': '1rPMEDCL',
     'EXA.PA':   '1rPEXA',
+    'AI.PA':    '1rPAI',
+    'CS.PA':    '1rPCS',
+    'MC.PA':    '1rPMC',
+    'RUI.PA':   '1rPRUI',
+    'SAN.PA':   '1rPSAN',
+    'SU.PA':    '1rPSU',
 }
 
 _HEADERS = {
@@ -341,6 +355,19 @@ def get_price(ticker: str, buy_price: float = 0.0):
         return None
     logger.error('%s: unavailable', ticker)
     return None
+
+def get_week_change(ticker: str):
+    try:
+        hist = yf.Ticker(ticker).history(period='7d', interval='1d')
+        closes = hist['Close'].dropna()
+        if len(closes) < 2:
+            return None, None, None
+        start, end = float(closes.iloc[0]), float(closes.iloc[-1])
+        pct = (end - start) / start * 100 if start else None
+        return start, end, pct
+    except Exception as e:
+        logger.warning('week change %s: %s', ticker, e)
+        return None, None, None
 
 # ── News fetching (best effort) ──────────────────────────────────────────────────
 
@@ -458,6 +485,38 @@ DEFAULT_THESES = {
         'score': 23, 'target': 110.0, 'stop': 58.0, 'alloc_target': 400,
         'resume': 'Drones navals — CA +40% T1 2026, carnet >1 Md€',
     },
+    'ALV.DE': {
+        'score': 17, 'target': 294.0, 'stop': 196.0, 'alloc_target': 300,
+        'resume': 'Allianz — assureur europeen leader, dividende stable, position rendement/diversification (pas une conviction de croissance)',
+    },
+    'PAEEM.PA': {
+        'score': 16, 'target': 40.0, 'stop': 24.0, 'alloc_target': 150,
+        'resume': 'ETF Amundi PEA Emergent — diversification marches emergents, exposition macro plutot que stock-picking',
+    },
+    'CS.PA': {
+        'score': 16, 'target': 34.0, 'stop': 21.0, 'alloc_target': 100,
+        'resume': 'AXA — assureur diversifie, valorisation decotee vs pairs, dividende solide, profil value',
+    },
+    'AI.PA': {
+        'score': 19, 'target': 190.0, 'stop': 130.0, 'alloc_target': 200,
+        'resume': "L'Air Liquide — leader mondial des gaz industriels, cash-flows recurrents, expose a l'hydrogene/transition energetique",
+    },
+    'MC.PA': {
+        'score': 18, 'target': 795.0, 'stop': 530.0, 'alloc_target': 3300,
+        'resume': 'LVMH — leader du luxe, marques diversifiees, resilience historique ; position deja large, pas de renforcement vise',
+    },
+    'RUI.PA': {
+        'score': 17, 'target': 27.0, 'stop': 16.0, 'alloc_target': 100,
+        'resume': 'Rubis — distribution/stockage energie, dividende eleve, diversification geographique, profil value/rendement cyclique',
+    },
+    'SAN.PA': {
+        'score': 18, 'target': 104.0, 'stop': 70.0, 'alloc_target': 200,
+        'resume': 'Sanofi — pharma diversifiee, pipeline vaccins/immunologie, profil defensif, croissance moderee',
+    },
+    'SU.PA': {
+        'score': 20, 'target': 281.0, 'stop': 188.0, 'alloc_target': 250,
+        'resume': 'Schneider Electric — leader electrification/efficacite energetique, expose data centers et IA, execution solide',
+    },
 }
 
 def _conseil_action(ticker: str, pos: dict, price: float | None, thèse: dict) -> str:
@@ -492,6 +551,18 @@ def _conseil_action(ticker: str, pos: dict, price: float | None, thèse: dict) -
         return f'🔵 Tenir — surpondéré vs cible {alloc_t}€, ne pas renforcer'
     return f'🔵 Tenir — P&L {s}{pnl_pct:.1f}%, score {score}/25, dans les bornes'
 
+def _priority_reinforcement(positions: dict, theses: dict, cash: float):
+    prio = sorted(
+        [(t, theses[t]['alloc_target'] - pos['qty'] * pos['buy'])
+         for t, pos in positions.items() if t in theses and
+         theses[t]['alloc_target'] - pos['qty'] * pos['buy'] > 50 and
+         theses[t].get('score', 0) >= 18],
+        key=lambda x: -theses.get(x[0], {}).get('score', 0)
+    )
+    if prio and cash > 50:
+        return prio[0]
+    return None
+
 def build_conseil() -> str:
     now = datetime.now(PARIS)
     lines = [f'🧠 Conseils au {now.strftime("%d/%m/%Y %H:%M")}', '']
@@ -511,17 +582,9 @@ def build_conseil() -> str:
         total_inv += pos['qty'] * pos['buy']
         lines.append('')
 
-    reserve = cash
-    prio = sorted(
-        [(t, theses[t]['alloc_target'] - pos['qty'] * pos['buy'])
-         for t, pos in positions.items() if t in theses and
-         theses[t]['alloc_target'] - pos['qty'] * pos['buy'] > 50 and
-         theses[t].get('score', 0) >= 18],
-        key=lambda x: -theses.get(x[0], {}).get('score', 0)
-    )
-    lines.append(f'💰 Cash disponible : {reserve:.2f}€')
-    if prio and reserve > 50:
-        top = prio[0]
+    lines.append(f'💰 Cash disponible : {cash:.2f}€')
+    top = _priority_reinforcement(positions, theses, cash)
+    if top:
         lines.append(f'🔖 Priorité : {top[0]} (+{top[1]:.0f}€ pour atteindre cible)')
     return '\n'.join(lines)
 
@@ -734,6 +797,64 @@ def run_weekly_review():
     send_telegram(msg)
     logger.info('Weekly review done')
 
+# ── Weekly report (samedi) ──────────────────────────────────────────────────────────────────
+
+def build_weekly_report() -> str:
+    now = datetime.now(PARIS)
+    week_start = (now - timedelta(days=6)).strftime('%d/%m')
+    week_end = now.strftime('%d/%m/%Y')
+    with _portfolio_lock:
+        positions = dict(_portfolio['positions'])
+        cash = _portfolio.get('cash', 0.0)
+        theses = dict(_portfolio.get('theses', {}))
+        promises = list(_portfolio.get('promises', []))
+
+    lines = [f'📅 Rapport hebdomadaire — semaine du {week_start} au {week_end}', '']
+    for ticker, pos in positions.items():
+        price = get_price(ticker, pos['buy'])
+        start, end, pct = get_week_change(ticker)
+        t = theses.get(ticker, {})
+        lines.append(f'{pos["name"]} ({ticker})')
+        if pct is not None:
+            s = '+' if pct >= 0 else ''
+            lines.append(f'  Semaine : {s}{pct:.1f}% ({start:.2f}€ → {end:.2f}€)')
+        else:
+            lines.append('  Semaine : variation indisponible')
+        if t:
+            lines.append(f'  Prévision : objectif {t["target"]:.2f}€ · stop {t["stop"]:.2f}€ · score thèse {t.get("score", "-")}/25')
+        lines.append(f'  Conseil : {_conseil_action(ticker, pos, price, t)}')
+        lines.append('')
+
+    today_iso = now.date().isoformat()
+    horizon = (now.date() + timedelta(days=14)).isoformat()
+    soon = [p for p in promises if p.get('status') == 'en attente' and p.get('deadline', '9999-12-31') <= horizon]
+    if soon:
+        lines.append('📌 Échéances à venir (14 jours) :')
+        for p in soon:
+            flag = ' — ÉCHÉANCE DÉPASSÉE' if p['deadline'] <= today_iso else ''
+            lines.append(f'- {p["ticker"]} : {p["text"]} ({p["deadline"]}){flag}')
+        lines.append('')
+
+    lines.append(f'💰 Cash disponible : {cash:.2f}€')
+    top = _priority_reinforcement(positions, theses, cash)
+    if top:
+        lines.append(f'🔖 Priorité renforcement : {top[0]} (+{top[1]:.0f}€ pour atteindre cible)')
+    return '\n'.join(lines)
+
+_last_weekly_report: date | None = None
+
+def run_weekly_saturday_report():
+    global _last_weekly_report
+    now = datetime.now(PARIS)
+    if now.weekday() != 5 or now.hour != 10 or now.minute != 0:
+        return
+    today = now.date()
+    if _last_weekly_report == today:
+        return
+    _last_weekly_report = today
+    send_telegram(build_weekly_report())
+    logger.info('Weekly Saturday report sent')
+
 # ── Alerts ──────────────────────────────────────────────────────────────────────────────────
 
 _prev_prices: dict[str, float] = {}
@@ -770,6 +891,8 @@ HELP_TEXT = (
     '  Thèses et scores de chaque position\n\n'
     '/rapport ou /r\n'
     '  Rapport complet immediat\n\n'
+    '/semaine\n'
+    '  Rapport hebdomadaire (variation 7j, previsions, conseils) — auto envoye le samedi 10h\n\n'
     '/prix TICKER\n'
     '  Ex : /prix GTT.PA\n\n'
     '/achat TICKER QTY PRIX\n'
@@ -895,6 +1018,8 @@ def handle_command(text: str, chat_id: str):
         return build_conseil()
     if cmd in ('/strategie', '/s'):
         return build_strategie_summary()
+    if cmd == '/semaine':
+        return build_weekly_report()
     if cmd == '/prix':
         return cmd_prix(args)
     if cmd == '/achat':
@@ -1000,6 +1125,7 @@ if __name__ == '__main__':
         'Rapports : ☀️ 09h00 / 🕛 12h30 / 🌙 17h35 (lun-ven)\n'
         'Journal quotidien : 📓 17h40 (lun-ven)\n'
         'Revue strategie : 📆 lundi 09h00 (ajuste les scores selon les stops/promesses)\n'
+        'Rapport hebdomadaire : 🗞️ samedi 10h00 (variation 7j, previsions, conseils)\n'
         'Alerte si variation +-5%\n\n'
         'Tape /help pour les commandes'
     )
@@ -1012,6 +1138,7 @@ if __name__ == '__main__':
         run_scheduled()
         run_daily_journal()
         run_weekly_review()
+        run_weekly_saturday_report()
         if tick % 30 == 0 and tick > 0:
             if datetime.now(PARIS).weekday() < 5:
                 check_alerts()
