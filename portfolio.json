@@ -1,11 +1,20 @@
 {
   "positions": {
-    "EXENS.PA": {"name": "Exosens",            "qty": 2, "buy": 61.20},
-    "GTT.PA":   {"name": "GTT",                "qty": 2, "buy": 203.20},
-    "IDL.PA":   {"name": "ID Logistics",       "qty": 1, "buy": 362.50},
-    "MEDCL.PA": {"name": "MedinCell",          "qty": 8, "buy": 28.01},
-    "EXA.PA":   {"name": "Exail Technologies", "qty": 2, "buy": 74.77}
+    "ALV.DE":   {"name": "Allianz SE",                         "qty": 1, "buy": 245.22},
+    "PAEEM.PA": {"name": "Amundi PEA Emergent (MSCI Emerging)", "qty": 3, "buy": 31.69},
+    "CS.PA":    {"name": "AXA",                                "qty": 2, "buy": 27.72},
+    "EXA.PA":   {"name": "Exail Technologies",                 "qty": 3, "buy": 84.09,  "target": 110.0, "stop": 58.0,  "alloc_target": 400},
+    "EXENS.PA": {"name": "Exosens",                             "qty": 2, "buy": 61.75,  "target": 95.0,  "stop": 48.0,  "alloc_target": 500},
+    "GTT.PA":   {"name": "GTT",                                 "qty": 2, "buy": 204.51, "target": 240.0, "stop": 170.0, "alloc_target": 300},
+    "IDL.PA":   {"name": "ID Logistics Group",                  "qty": 1, "buy": 364.94, "target": 460.0, "stop": 290.0, "alloc_target": 250},
+    "AI.PA":    {"name": "L'Air Liquide",                       "qty": 1, "buy": 158.25},
+    "MC.PA":    {"name": "LVMH",                                "qty": 5, "buy": 662.52},
+    "MEDCL.PA": {"name": "MedinCell",                           "qty": 8, "buy": 28.01,  "target": 45.0,  "stop": 20.0,  "alloc_target": 300},
+    "RUI.PA":   {"name": "Rubis",                               "qty": 3, "buy": 21.59},
+    "SAN.PA":   {"name": "Sanofi",                              "qty": 2, "buy": 86.99},
+    "SU.PA":    {"name": "Schneider Electric",                  "qty": 1, "buy": 234.52}
   },
-  "cash": 1.37,
-  "transactions": []
+  "cash": 384.69,
+  "transactions": [],
+  "promises": []
 }
