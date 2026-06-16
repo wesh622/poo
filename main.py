@@ -38,6 +38,7 @@ DEFAULT_PORTFOLIO = {
     'transactions': [],
     'promises': [],
     'theses': {},  # rempli depuis DEFAULT_THESES au premier chargement
+    'access': {'superusers': [], 'whitelist': [], 'blacklist': []},
 }
 
 _portfolio: dict = {}
@@ -94,6 +95,9 @@ def load_portfolio():
             _portfolio.setdefault('promises', [])
             if not _portfolio.get('theses'):
                 _portfolio['theses'] = copy.deepcopy(DEFAULT_THESES)
+            access = _portfolio.setdefault('access', {})
+            for key in ('superusers', 'whitelist', 'blacklist'):
+                access.setdefault(key, [])
             logger.info('Portfolio loaded from GitHub')
             return
         except Exception as e:
@@ -156,12 +160,88 @@ def append_journal(entry: str):
         gh_put(path, updated, f'journal: {now}', sha)
     threading.Thread(target=_do, daemon=True).start()
 
+def append_access_log(entry: str):
+    if not GITHUB_TOKEN:
+        return
+    def _do():
+        path = 'data/access_log.md'
+        content, sha = gh_get(path)
+        header = (
+            "# Journal d'acces au bot\n\n"
+            "Chaque ligne : date/heure (Paris) | identifiant Telegram | requete | statut | reponse.\n"
+        )
+        updated = (content or header) + entry + '\n'
+        gh_put(path, updated, 'log: acces bot', sha)
+    threading.Thread(target=_do, daemon=True).start()
+
+# ── Controle d'acces (owner / super-utilisateurs / whitelist / blacklist) ──────────────────────
+
+def is_owner(chat_id: str) -> bool:
+    return chat_id == str(TELEGRAM_CHAT_ID)
+
+def _access() -> dict:
+    with _portfolio_lock:
+        return {
+            'superusers': [str(x) for x in _portfolio.get('access', {}).get('superusers', [])],
+            'whitelist':  [str(x) for x in _portfolio.get('access', {}).get('whitelist', [])],
+            'blacklist':  [str(x) for x in _portfolio.get('access', {}).get('blacklist', [])],
+        }
+
+def is_admin(chat_id: str) -> bool:
+    return is_owner(chat_id) or chat_id in _access()['superusers']
+
+def is_blacklisted(chat_id: str) -> bool:
+    return chat_id in _access()['blacklist']
+
+def is_authorized(chat_id: str) -> bool:
+    if is_blacklisted(chat_id):
+        return False
+    if is_admin(chat_id):
+        return True
+    return chat_id in _access()['whitelist']
+
+def cmd_manage_access(key: str, args):
+    if not args:
+        return f'Usage : /{key} add ID | /{key} remove ID | /{key} list'
+    action = args[0].lower()
+    with _portfolio_lock:
+        lst = _portfolio.setdefault('access', {}).setdefault(key, [])
+        if action == 'list':
+            items = list(lst)
+        elif action in ('add', 'remove') and len(args) >= 2:
+            value = args[1]
+            if action == 'add' and value not in lst:
+                lst.append(value)
+            elif action == 'remove' and value in lst:
+                lst.remove(value)
+            items = None
+        else:
+            return f'Usage : /{key} add ID | /{key} remove ID | /{key} list'
+    if items is not None:
+        return f'{key} :\n' + ('\n'.join(f'- {x}' for x in items) if items else '(vide)')
+    save_portfolio()
+    return f'✅ {key} mis a jour ({action} {value})'
+
+def cmd_acces(args):
+    n = 10
+    if args:
+        try:
+            n = max(1, min(50, int(args[0])))
+        except ValueError:
+            pass
+    content, _ = gh_get('data/access_log.md')
+    entries = [l for l in content.splitlines() if l.startswith('- ')] if content else []
+    if not entries:
+        return "Aucun acces enregistre pour le moment."
+    return '🔐 Derniers acces au bot\n\n' + '\n'.join(entries[-n:])
+
 # ── Telegram ─────────────────────────────────────────────────────────────────────────────────
 
-def send_telegram(text: str):
+def send_telegram(text: str, chat_id: str = None):
+    target = chat_id or TELEGRAM_CHAT_ID
     url = f'https://api.telegram.org/bot{TELEGRAM_TOKEN}/sendMessage'
     try:
-        r = requests.post(url, json={'chat_id': TELEGRAM_CHAT_ID, 'text': text}, timeout=10)
+        r = requests.post(url, json={'chat_id': target, 'text': text}, timeout=10)
         if not r.ok:
             logger.error('Telegram %s: %s', r.status_code, r.text)
         else:
@@ -707,6 +787,18 @@ HELP_TEXT = (
     '  Affiche ce message'
 )
 
+ADMIN_HELP_TEXT = (
+    '\n\n🔐 Commandes super-utilisateur :\n\n'
+    '/acces [N]\n'
+    '  Affiche les N derniers acces au bot (defaut 10), refuses compris\n\n'
+    '/whitelist add|remove|list ID\n'
+    '  Gere les comptes Telegram autorises a utiliser le bot\n\n'
+    '/blacklist add|remove|list ID\n'
+    '  Gere les comptes Telegram explicitement bloques\n\n'
+    '/superuser add|remove|list ID  (owner uniquement)\n'
+    '  Gere les super-utilisateurs (acces complet)'
+)
+
 def cmd_prix(args):
     if not args:
         return 'Usage : /prix TICKER   ex : /prix GTT.PA'
@@ -786,7 +878,7 @@ def cmd_vente(args):
     append_history(f'**VENTE** {ticker} x{qty} @ {price:.2f}€ — {detail}')
     return f'✅ Vente enregistree\n{ticker} x{qty} @ {price:.2f}€\n{detail}'
 
-def handle_command(text: str):
+def handle_command(text: str, chat_id: str):
     raw   = text.strip()
     parts = raw.split()
     cmd   = parts[0].lower().split('@')[0]
@@ -794,7 +886,7 @@ def handle_command(text: str):
     rest  = raw[len(parts[0]):].strip() if len(parts) > 1 else ''
 
     if cmd == '/help':
-        return HELP_TEXT
+        return HELP_TEXT + (ADMIN_HELP_TEXT if is_admin(chat_id) else '')
     if cmd in ('/portfolio', '/p'):
         return build_report('📊 Portefeuille (live)')
     if cmd in ('/rapport', '/r'):
@@ -815,6 +907,22 @@ def handle_command(text: str):
         return cmd_promesses()
     if cmd == '/maj_promesse':
         return cmd_maj_promesse(args)
+    if cmd == '/acces':
+        if not is_admin(chat_id):
+            return '⛔ Reserve au owner et aux super-utilisateurs.'
+        return cmd_acces(args)
+    if cmd == '/whitelist':
+        if not is_admin(chat_id):
+            return '⛔ Reserve au owner et aux super-utilisateurs.'
+        return cmd_manage_access('whitelist', args)
+    if cmd == '/blacklist':
+        if not is_admin(chat_id):
+            return '⛔ Reserve au owner et aux super-utilisateurs.'
+        return cmd_manage_access('blacklist', args)
+    if cmd == '/superuser':
+        if not is_owner(chat_id):
+            return '⛔ Reserve au owner.'
+        return cmd_manage_access('superusers', args)
     if cmd == '/start':
         return '🤖 Bot Portefeuille Omar\nTape /help pour voir les commandes.'
     return None
@@ -831,12 +939,34 @@ def poll_loop():
                 msg     = upd.get('message', {})
                 chat_id = str(msg.get('chat', {}).get('id', ''))
                 text    = msg.get('text', '')
-                if chat_id != str(TELEGRAM_CHAT_ID):
+                if not text:
                     continue
+                frm     = msg.get('from', {})
+                uid     = frm.get('id', '')
+                label   = f"@{frm['username']}" if frm.get('username') else (frm.get('first_name') or 'inconnu')
+                now_str = datetime.now(PARIS).strftime('%Y-%m-%d %H:%M:%S')
+
+                if not is_authorized(chat_id):
+                    append_access_log(
+                        f'- {now_str} | chat_id={chat_id} user={label} (id {uid}) | '
+                        f'requete: "{text[:200]}" | statut: REFUSE (non autorise)'
+                    )
+                    continue
+
                 if text.startswith('/'):
-                    reply = handle_command(text)
+                    reply = handle_command(text, chat_id)
+                    reply_log = (reply[:200] + '…') if reply and len(reply) > 200 else (reply or '(pas de reponse)')
+                    append_access_log(
+                        f'- {now_str} | chat_id={chat_id} user={label} (id {uid}) | '
+                        f'requete: "{text[:200]}" | statut: autorise | reponse: "{reply_log}"'
+                    )
                     if reply:
-                        send_telegram(reply)
+                        send_telegram(reply, chat_id)
+                else:
+                    append_access_log(
+                        f'- {now_str} | chat_id={chat_id} user={label} (id {uid}) | '
+                        f'requete: "{text[:200]}" | statut: ignore (pas une commande)'
+                    )
         except Exception as e:
             logger.error('poll_loop: %s', e)
             time.sleep(5)
