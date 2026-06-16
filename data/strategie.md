@@ -25,12 +25,13 @@
 - **Score** : 22/25 — Sous-cotée ✓ · Projets LT ✓ · Track record ✓ · Innovation ✓ · Marché ✓
 - **Action suggérée** : Renforcer progressivement jusqu'à 500€
 
-### EXAIL.PA — Exail Technologies (PEA)
+### EXA.PA — Exail Technologies (PEA)
 - **Thèse** : Drones navals + navigation inertielle. CA +40% T1 2026, carnet commandes > 1 Md€, visibilité 3 ans.
 - **Entrée** : 74.77€ × 2 = 149.54€ (cible allocation : 400€)
 - **Objectif** : 110€ · **Stop** : 58€
 - **Score** : 23/25 — Sous-cotée ✓ · Projets LT ✓ · Track record ✓ · Innovation ✓ · Marché ✓
 - **Action suggérée** : Renforcer jusqu'à 400€
+- **Note** : ticker boursier réel = `EXA.PA` (ISIN FR0000062671), pas `EXAIL.PA` qui n'existe pas
 
 ### MEDCL.PA — MedinCell (PEA)
 - **Thèse** : Biotech injectable longue durée, technologie BEPO® brevetée. Dossier EMA accepté, 2 analystes initient à l'achat.
@@ -58,7 +59,7 @@
 ## Budget restant
 - **Déployé** : ~1 265€
 - **Réserve** : ~735€
-- **Priorité de déploiement** : EXENS (+378€) > EXAIL (+250€) > MEDCL (+76€)
+- **Priorité de déploiement** : EXENS (+378€) > EXA (+250€) > MEDCL (+76€)
 
 ---
 
@@ -67,6 +68,7 @@
 | Date | Version | Modification | Raison |
 |------|---------|--------------|--------|
 | 2026-06-09 | v1 | Critères initiaux | Création portefeuille |
+| 2026-06-16 | v1.1 | Correction ticker EXAIL.PA → EXA.PA | EXAIL.PA n'existe pas, causait des prix faux/indisponibles |
 
 ---
 

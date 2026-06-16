@@ -31,7 +31,7 @@ DEFAULT_PORTFOLIO = {
         'GTT.PA':   {'name': 'GTT',                'qty': 2,  'buy': 203.20, 'target': 240.0, 'stop': 170.0, 'alloc_target': 300},
         'IDL.PA':   {'name': 'ID Logistics',       'qty': 1,  'buy': 362.50, 'target': 460.0, 'stop': 290.0, 'alloc_target': 250},
         'MEDCL.PA': {'name': 'MedinCell',          'qty': 8,  'buy': 28.01,  'target': 45.0,  'stop': 20.0,  'alloc_target': 300},
-        'EXAIL.PA': {'name': 'Exail Technologies', 'qty': 2,  'buy': 74.77,  'target': 110.0, 'stop': 58.0,  'alloc_target': 400},
+        'EXA.PA':   {'name': 'Exail Technologies', 'qty': 2,  'buy': 74.77,  'target': 110.0, 'stop': 58.0,  'alloc_target': 400},
     },
     'cash': 1.37,
     'transactions': [],
@@ -170,7 +170,7 @@ BOURSORAMA_CODES = {
     'GTT.PA':   '1rPGTT',
     'IDL.PA':   '1rPIDL',
     'MEDCL.PA': '1rPMEDCL',
-    'EXAIL.PA': '1rPEXAIL',
+    'EXA.PA':   '1rPEXA',
 }
 
 _HEADERS = {
@@ -312,7 +312,7 @@ _THESES = {
         'score': 20, 'target': 45.0, 'stop': 20.0, 'alloc_target': 300,
         'resume': 'Biotech BEPO® — dossier EMA accepté, 2 analystes à l\'achat',
     },
-    'EXAIL.PA': {
+    'EXA.PA': {
         'score': 23, 'target': 110.0, 'stop': 58.0, 'alloc_target': 400,
         'resume': 'Drones navals — CA +40% T1 2026, carnet >1 Md€',
     },
@@ -481,7 +481,7 @@ HELP_TEXT = (
     '/prix TICKER\n'
     '  Ex : /prix GTT.PA\n\n'
     '/achat TICKER QTY PRIX\n'
-    '  Ex : /achat EXAIL.PA 3 132.50\n\n'
+    '  Ex : /achat EXA.PA 3 132.50\n\n'
     '/vente TICKER QTY PRIX\n'
     '  Ex : /vente GTT.PA 1 205.00\n\n'
     '/help\n'
@@ -501,7 +501,7 @@ def cmd_prix(args):
 
 def cmd_achat(args):
     if len(args) < 3:
-        return 'Usage : /achat TICKER QTY PRIX   ex : /achat EXAIL.PA 3 132.50'
+        return 'Usage : /achat TICKER QTY PRIX   ex : /achat EXA.PA 3 132.50'
     ticker = args[0].upper()
     if '.' not in ticker:
         ticker += '.PA'
@@ -509,7 +509,7 @@ def cmd_achat(args):
         qty   = int(args[1])
         price = float(args[2].replace(',', '.'))
     except ValueError:
-        return 'Format invalide.   ex : /achat EXAIL.PA 3 132.50'
+        return 'Format invalide.   ex : /achat EXA.PA 3 132.50'
 
     with _portfolio_lock:
         positions = _portfolio['positions']

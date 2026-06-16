@@ -4,7 +4,7 @@
     "GTT.PA":   {"name": "GTT",                "qty": 2, "buy": 203.20},
     "IDL.PA":   {"name": "ID Logistics",       "qty": 1, "buy": 362.50},
     "MEDCL.PA": {"name": "MedinCell",          "qty": 8, "buy": 28.01},
-    "EXAIL.PA": {"name": "Exail Technologies", "qty": 2, "buy": 74.77}
+    "EXA.PA":   {"name": "Exail Technologies", "qty": 2, "buy": 74.77}
   },
   "cash": 1.37,
   "transactions": []
