@@ -21,3 +21,5 @@ Chaque ligne : date/heure (Paris) | identifiant Telegram | requete | statut | re
 
 /strategie ou /s
   Thèses et scores de chaque positio…"
+- 2026-06-16 13:47:45 | chat_id=6808484892 user=clyde (id 6808484892) | requete: "/superuser list ID" | statut: autorise | reponse: "superusers :
+(vide)"
