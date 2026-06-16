@@ -37,3 +37,4 @@ Chaque ligne : date/heure (Paris) | identifiant Telegram | requete | statut | re
 
 /strategie ou /s
   Thèses et scores de chaque positio…"
+- 2026-06-16 13:50:49 | chat_id=6808484892 user=clyde (id 6808484892) | requete: "/promesses" | statut: autorise | reponse: "Aucune promesse suivie. Ajoute avec /annonce TICKER texte | YYYY-MM-DD"
