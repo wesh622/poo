@@ -1,20 +1,186 @@
 {
   "positions": {
-    "ALV.DE":   {"name": "Allianz SE",                         "qty": 1, "buy": 245.22},
-    "PAEEM.PA": {"name": "Amundi PEA Emergent (MSCI Emerging)", "qty": 3, "buy": 31.69},
-    "CS.PA":    {"name": "AXA",                                "qty": 2, "buy": 27.72},
-    "EXA.PA":   {"name": "Exail Technologies",                 "qty": 3, "buy": 84.09,  "target": 110.0, "stop": 58.0,  "alloc_target": 400},
-    "EXENS.PA": {"name": "Exosens",                             "qty": 2, "buy": 61.75,  "target": 95.0,  "stop": 48.0,  "alloc_target": 500},
-    "GTT.PA":   {"name": "GTT",                                 "qty": 2, "buy": 204.51, "target": 240.0, "stop": 170.0, "alloc_target": 300},
-    "IDL.PA":   {"name": "ID Logistics Group",                  "qty": 1, "buy": 364.94, "target": 460.0, "stop": 290.0, "alloc_target": 250},
-    "AI.PA":    {"name": "L'Air Liquide",                       "qty": 1, "buy": 158.25},
-    "MC.PA":    {"name": "LVMH",                                "qty": 5, "buy": 662.52},
-    "MEDCL.PA": {"name": "MedinCell",                           "qty": 8, "buy": 28.01,  "target": 45.0,  "stop": 20.0,  "alloc_target": 300},
-    "RUI.PA":   {"name": "Rubis",                               "qty": 3, "buy": 21.59},
-    "SAN.PA":   {"name": "Sanofi",                              "qty": 2, "buy": 86.99},
-    "SU.PA":    {"name": "Schneider Electric",                  "qty": 1, "buy": 234.52}
+    "ALV.DE": {
+      "name": "Allianz SE",
+      "qty": 1,
+      "buy": 245.22
+    },
+    "PAEEM.PA": {
+      "name": "Amundi PEA Emergent (MSCI Emerging)",
+      "qty": 3,
+      "buy": 31.69
+    },
+    "CS.PA": {
+      "name": "AXA",
+      "qty": 2,
+      "buy": 27.72
+    },
+    "EXA.PA": {
+      "name": "Exail Technologies",
+      "qty": 3,
+      "buy": 84.09,
+      "target": 110.0,
+      "stop": 58.0,
+      "alloc_target": 400
+    },
+    "EXENS.PA": {
+      "name": "Exosens",
+      "qty": 2,
+      "buy": 61.75,
+      "target": 95.0,
+      "stop": 48.0,
+      "alloc_target": 500
+    },
+    "GTT.PA": {
+      "name": "GTT",
+      "qty": 2,
+      "buy": 204.51,
+      "target": 240.0,
+      "stop": 170.0,
+      "alloc_target": 300
+    },
+    "IDL.PA": {
+      "name": "ID Logistics Group",
+      "qty": 1,
+      "buy": 364.94,
+      "target": 460.0,
+      "stop": 290.0,
+      "alloc_target": 250
+    },
+    "AI.PA": {
+      "name": "L'Air Liquide",
+      "qty": 1,
+      "buy": 158.25
+    },
+    "MC.PA": {
+      "name": "LVMH",
+      "qty": 5,
+      "buy": 662.52
+    },
+    "MEDCL.PA": {
+      "name": "MedinCell",
+      "qty": 8,
+      "buy": 28.01,
+      "target": 45.0,
+      "stop": 20.0,
+      "alloc_target": 300
+    },
+    "RUI.PA": {
+      "name": "Rubis",
+      "qty": 3,
+      "buy": 21.59
+    },
+    "SAN.PA": {
+      "name": "Sanofi",
+      "qty": 2,
+      "buy": 86.99
+    },
+    "SU.PA": {
+      "name": "Schneider Electric",
+      "qty": 1,
+      "buy": 234.52
+    }
   },
   "cash": 384.69,
   "transactions": [],
-  "promises": []
+  "promises": [],
+  "theses": {
+    "EXENS.PA": {
+      "score": 22,
+      "target": 95.0,
+      "stop": 48.0,
+      "alloc_target": 500,
+      "resume": "Défense/vision nocturne — commandes record, doublement capacité prod"
+    },
+    "GTT.PA": {
+      "score": 21,
+      "target": 240.0,
+      "stop": 170.0,
+      "alloc_target": 300,
+      "resume": "Licences méthaniers GNL — marges 60%+, 53 commandes 2026"
+    },
+    "IDL.PA": {
+      "score": 20,
+      "target": 460.0,
+      "stop": 290.0,
+      "alloc_target": 250,
+      "resume": "Logistique contractuelle — CA +14% T1 2026, track record 5 ans"
+    },
+    "MEDCL.PA": {
+      "score": 20,
+      "target": 45.0,
+      "stop": 20.0,
+      "alloc_target": 300,
+      "resume": "Biotech BEPO® — dossier EMA accepte, 2 analystes a l'achat"
+    },
+    "EXA.PA": {
+      "score": 23,
+      "target": 110.0,
+      "stop": 58.0,
+      "alloc_target": 400,
+      "resume": "Drones navals — CA +40% T1 2026, carnet >1 Md€"
+    },
+    "ALV.DE": {
+      "score": 17,
+      "target": 294.0,
+      "stop": 196.0,
+      "alloc_target": 300,
+      "resume": "Allianz — assureur europeen leader, dividende stable, position rendement/diversification (pas une conviction de croissance)"
+    },
+    "PAEEM.PA": {
+      "score": 16,
+      "target": 40.0,
+      "stop": 24.0,
+      "alloc_target": 150,
+      "resume": "ETF Amundi PEA Emergent — diversification marches emergents, exposition macro plutot que stock-picking"
+    },
+    "CS.PA": {
+      "score": 16,
+      "target": 34.0,
+      "stop": 21.0,
+      "alloc_target": 100,
+      "resume": "AXA — assureur diversifie, valorisation decotee vs pairs, dividende solide, profil value"
+    },
+    "AI.PA": {
+      "score": 19,
+      "target": 190.0,
+      "stop": 130.0,
+      "alloc_target": 200,
+      "resume": "L'Air Liquide — leader mondial des gaz industriels, cash-flows recurrents, expose a l'hydrogene/transition energetique"
+    },
+    "MC.PA": {
+      "score": 15,
+      "target": 795.0,
+      "stop": 530.0,
+      "alloc_target": 3300,
+      "resume": "LVMH — leader du luxe, marques diversifiees, resilience historique ; position deja large, pas de renforcement vise",
+      "stop_flagged": true
+    },
+    "RUI.PA": {
+      "score": 17,
+      "target": 27.0,
+      "stop": 16.0,
+      "alloc_target": 100,
+      "resume": "Rubis — distribution/stockage energie, dividende eleve, diversification geographique, profil value/rendement cyclique"
+    },
+    "SAN.PA": {
+      "score": 18,
+      "target": 104.0,
+      "stop": 70.0,
+      "alloc_target": 200,
+      "resume": "Sanofi — pharma diversifiee, pipeline vaccins/immunologie, profil defensif, croissance moderee"
+    },
+    "SU.PA": {
+      "score": 20,
+      "target": 281.0,
+      "stop": 188.0,
+      "alloc_target": 250,
+      "resume": "Schneider Electric — leader electrification/efficacite energetique, expose data centers et IA, execution solide"
+    }
+  },
+  "access": {
+    "superusers": [],
+    "whitelist": [],
+    "blacklist": []
+  }
 }
