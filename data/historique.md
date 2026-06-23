@@ -679,3 +679,23 @@
 - Schneider Electric (SU.PA): 280.95€  +46.43€ (+19.8%)
 
 **Total** : 5051.54€  P&L -662.12€ (-11.6%)
+
+## 2026-06-23 17:35
+
+**🌙 Rapport de cloture** — 2026-06-23 17:35
+
+- Allianz SE (ALV.DE): 405.70€  +160.48€ (+65.4%)
+- Amundi PEA Emergent (MSCI Emerging) (PAEEM.PA): 36.65€  +14.87€ (+15.6%)
+- AXA (CS.PA): 42.74€  +30.04€ (+54.2%)
+- Exail Technologies (EXA.PA): 102.80€  +56.13€ (+22.2%)
+- Exosens (EXENS.PA): 58.05€  -7.40€ (-6.0%)
+- GTT (GTT.PA): 189.90€  -29.22€ (-7.1%)
+- ID Logistics Group (IDL.PA): 337.50€  -27.44€ (-7.5%)
+- L'Air Liquide (AI.PA): 166.44€  +8.19€ (+5.2%)
+- LVMH (MC.PA): 483.70€  -894.10€ (-27.0%)
+- MedinCell (MEDCL.PA): 26.36€  -13.20€ (-5.9%)
+- Rubis (RUI.PA): 32.34€  +32.25€ (+49.8%)
+- Sanofi (SAN.PA): 73.47€  -27.04€ (-15.5%)
+- Schneider Electric (SU.PA): 281.10€  +46.58€ (+19.9%)
+
+**Total** : 5063.80€  P&L -649.86€ (-11.4%)
