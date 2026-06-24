@@ -454,3 +454,44 @@ Objectif : comparer ce qui a ete annonce par les entreprises avec ce qui a ete r
 
 **Schneider Electric (SU.PA)** : 279.50€ (premiere mesure du jour)
   Actualites recentes : actualite non recuperee
+
+## 2026-06-24
+
+**Allianz SE (ALV.DE)** : 405.20€ (premiere mesure du jour)
+  Actualites recentes : actualite non recuperee
+
+**Amundi PEA Emergent (MSCI Emerging) (PAEEM.PA)** : 36.60€ (premiere mesure du jour)
+  Actualites recentes : actualite non recuperee
+
+**AXA (CS.PA)** : 42.80€ (premiere mesure du jour)
+  Actualites recentes : actualite non recuperee
+
+**Exail Technologies (EXA.PA)** : 98.90€ (premiere mesure du jour)
+  Actualites recentes : actualite non recuperee
+
+**Exosens (EXENS.PA)** : 55.15€ (premiere mesure du jour)
+  Actualites recentes : actualite non recuperee
+
+**GTT (GTT.PA)** : 186.30€ (premiere mesure du jour)
+  Actualites recentes : actualite non recuperee
+
+**ID Logistics Group (IDL.PA)** : 341.00€ (premiere mesure du jour)
+  Actualites recentes : actualite non recuperee
+
+**L'Air Liquide (AI.PA)** : 169.76€ (premiere mesure du jour)
+  Actualites recentes : actualite non recuperee
+
+**LVMH (MC.PA)** : 493.00€ (premiere mesure du jour)
+  Actualites recentes : actualite non recuperee
+
+**MedinCell (MEDCL.PA)** : 25.02€ (premiere mesure du jour)
+  Actualites recentes : actualite non recuperee
+
+**Rubis (RUI.PA)** : 31.48€ (premiere mesure du jour)
+  Actualites recentes : actualite non recuperee
+
+**Sanofi (SAN.PA)** : 73.55€ (premiere mesure du jour)
+  Actualites recentes : actualite non recuperee
+
+**Schneider Electric (SU.PA)** : 280.50€ (premiere mesure du jour)
+  Actualites recentes : actualite non recuperee
