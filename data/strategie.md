@@ -130,6 +130,26 @@ Ces 8 positions viennent de l'export réel BourseDirect (13 positions au total, 
 ## Revues hebdomadaires
 
 <!-- Les revues automatiques du bot sont ajoutees ici chaque lundi -->
+### Revue 2026-07-06
+
+- Allianz SE (ALV.DE): 419.80€  +71.2%
+- Amundi PEA Emergent (MSCI Emerging) (PAEEM.PA): 36.60€  +15.5%
+- AXA (CS.PA): 43.71€  +57.7%
+- Exail Technologies (EXA.PA): 122.50€  +45.7%
+- Exosens (EXENS.PA): 58.80€  -4.8%
+- GTT (GTT.PA): 189.50€  -7.3%
+- ID Logistics Group (IDL.PA): 359.00€  -1.6%
+- L'Air Liquide (AI.PA): 181.16€  +14.5%
+- LVMH (MC.PA): 497.33€  -24.9%
+- MedinCell (MEDCL.PA): 29.70€  +6.0%
+- Rubis (RUI.PA): 31.72€  +46.9%
+- Sanofi (SAN.PA): 76.11€  -12.5%
+- Schneider Electric (SU.PA): 278.40€  +18.7%
+
+Total investi : 5713.66€ | Valeur : 5271.32€ | P&L -442.34€
+
+⚠️ Alertes stratégie : OBJECTIF proche ALV.DE (419.80€ / 294.00€), OBJECTIF proche CS.PA (43.71€ / 34.00€), OBJECTIF proche EXA.PA (122.50€ / 110.00€), OBJECTIF proche AI.PA (181.16€ / 190.00€), STOP MC.PA (497.33€ ≤ 530.00€), OBJECTIF proche RUI.PA (31.72€ / 27.00€), OBJECTIF proche SU.PA (278.40€ / 281.00€)
+
 ### Revue 2026-06-29
 
 - Allianz SE (ALV.DE): 407.90€  +66.3%
